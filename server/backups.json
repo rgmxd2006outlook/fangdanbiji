@@ -1,0 +1,12 @@
+{
+  "backups": [
+    {
+      "id": "bk_1774713785767_t3zfvc",
+      "email": "test@example.com",
+      "encryptedPayload": "abc",
+      "version": "v1",
+      "createdAt": "2026-03-28T16:03:05.767Z",
+      "size": 3
+    }
+  ]
+}
