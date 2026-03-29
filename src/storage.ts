@@ -34,8 +34,22 @@ export function loadData(): AppData {
       ...t,
       actions: (t.actions ?? []).map((a) => ({
         ...a,
-        tagIds: a.tagIds ?? []
+        tagIds: a.tagIds ?? [],
+        stepId: a.stepId,
+        note: a.note ?? "",
+        noteEntries:
+          a.noteEntries ??
+          (a.note
+            ? [
+                {
+                  id: `note_legacy_${a.id}`,
+                  content: a.note,
+                  createdAt: a.createdAt
+                }
+              ]
+            : [])
       })),
+      steps: t.steps ?? [],
       materials: t.materials ?? [],
       reviews: t.reviews ?? [],
       logs: t.logs ?? [],
@@ -47,19 +61,54 @@ export function loadData(): AppData {
         ...a.taskSnapshot,
         actions: (a.taskSnapshot.actions ?? []).map((action) => ({
           ...action,
-          tagIds: action.tagIds ?? []
+          tagIds: action.tagIds ?? [],
+          stepId: action.stepId,
+          note: action.note ?? "",
+          noteEntries:
+            action.noteEntries ??
+            (action.note
+              ? [
+                  {
+                    id: `note_legacy_${action.id}`,
+                    content: action.note,
+                    createdAt: action.createdAt
+                  }
+                ]
+              : [])
         })),
+        steps: a.taskSnapshot.steps ?? [],
         materials: a.taskSnapshot.materials ?? [],
         reviews: a.taskSnapshot.reviews ?? [],
         logs: a.taskSnapshot.logs ?? [],
         tagIds: a.taskSnapshot.tagIds ?? []
       }
     }));
+    const normalizedStashes = (parsed.stashes ?? []).map((s) => ({
+      ...s,
+      links: s.links ?? [],
+      files: s.files ?? [],
+      source: s.source ?? "manual"
+    }));
+    const migratedFromIdeas = (parsed.ideas ?? [])
+      .filter((i) => i.status !== "deleted")
+      .map((i) => ({
+        id: `migrated_${i.id}`,
+        title: i.title || "历史灵感",
+        contentText: i.detail || i.title,
+        links: [],
+        files: [],
+        source: "manual" as const,
+        dueAt: i.createdAt,
+        status: i.status === "converted" ? ("processed" as const) : ("pending" as const),
+        createdAt: i.createdAt
+      }));
+
     return {
       ...initialData,
       ...parsed,
       tasks: normalizedTasks,
       archives: normalizedArchives,
+      stashes: [...normalizedStashes, ...migratedFromIdeas],
       config: {
         ...initialData.config,
         ...parsed.config

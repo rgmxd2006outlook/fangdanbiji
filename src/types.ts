@@ -14,14 +14,32 @@ export interface TaskUpdateLog {
   id: string;
   field: "title" | "forWhomWhy" | "successMetric" | "obstacles";
   at: string;
+  oldValue?: string;
+  newValue?: string;
 }
 
 export interface TaskAction {
   id: string;
   content: string;
   ideaId?: string;
+  stashId?: string;
+  stepId?: string;
+  note?: string;
+  noteEntries?: ActionNoteEntry[];
   status: ActionStatus;
   tagIds: string[];
+  createdAt: string;
+}
+
+export interface ActionNoteEntry {
+  id: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface TaskStep {
+  id: string;
+  name: string;
   createdAt: string;
 }
 
@@ -36,9 +54,10 @@ export interface Review {
 export interface Material {
   id: string;
   actionId: string;
-  type: "file" | "link";
+  type: "file" | "link" | "text" | "code" | "image";
   name: string;
   url?: string;
+  content?: string;
   fileMeta?: {
     size: number;
     mime: string;
@@ -57,6 +76,7 @@ export interface Task {
   status: TaskStatus;
   createdAt: string;
   updatedAt: string;
+  steps: TaskStep[];
   actions: TaskAction[];
   materials: Material[];
   reviews: Review[];
@@ -94,9 +114,20 @@ export interface Stash {
   title: string;
   contentText: string;
   links: string[];
+  source?: "manual" | "qq_bot";
+  sourceMeta?: {
+    sender?: string;
+    qq?: string;
+  };
+  files?: Array<{
+    name: string;
+    mime: string;
+    size: number;
+    dataUrl: string;
+  }>;
   dueAt: string;
   relatedTaskId?: string;
-  status: "pending" | "processed" | "deleted";
+  status: "pending" | "processed" | "future" | "deleted";
   createdAt: string;
 }
 
@@ -114,7 +145,7 @@ export interface BackupRecord {
   size: number;
 }
 
-export type TabKey = "dashboard" | "ideas" | "tasks" | "archives" | "stash" | "settings";
+export type TabKey = "dashboard" | "collect" | "tasks" | "archives" | "settings";
 
 export interface SearchResult {
   id: string;

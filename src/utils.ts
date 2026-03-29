@@ -124,7 +124,7 @@ export function searchAll(data: AppData, q: string): SearchResult[] {
 
   for (const task of data.tasks) {
     const materialText = (task.materials ?? [])
-      .map((m) => `${m.name} ${m.url ?? ""}`)
+      .map((m) => `${m.name} ${m.url ?? ""} ${m.content ?? ""}`)
       .join(" ");
     const taskText = `${task.title} ${task.forWhomWhy} ${task.successMetric} ${task.obstacles} ${materialText}`;
     const taskScore = scoreText(tokens, taskText);
@@ -173,7 +173,8 @@ export function searchAll(data: AppData, q: string): SearchResult[] {
   }
 
   for (const stash of data.stashes.filter((s) => s.status !== "deleted")) {
-    const text = `${stash.title} ${stash.contentText} ${stash.links.join(" ")}`;
+    const fileText = (stash.files ?? []).map((f) => `${f.name} ${f.mime}`).join(" ");
+    const text = `${stash.title} ${stash.contentText} ${stash.links.join(" ")} ${fileText}`;
     const score = scoreText(tokens, text);
     if (score > 0) {
       results.push({
